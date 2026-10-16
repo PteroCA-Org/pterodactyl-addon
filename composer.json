@@ -1,6 +1,6 @@
 {
     "name": "pteroca-com/pterodactyl-addon",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "This package brings an API interface to the application API in order to be able to create API tokens for a user",
     "keywords": [
         "PterodactylApiAddon",

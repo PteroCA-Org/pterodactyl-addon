@@ -4,6 +4,8 @@ namespace Pteroca\PterodactylAddon\Http\Controllers;
 
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 use Pteroca\PterodactylAddon\Http\Requests\GetUsersApiKeysRequest;
+use Pteroca\PterodactylAddon\Http\Requests\StoreUserApiKeyRequest;
+use Pteroca\PterodactylAddon\Http\Requests\DeleteUserApiKeyRequest;
 use Pterodactyl\Models\ApiKey;
 use Illuminate\Http\JsonResponse;
 use Pterodactyl\Models\User;
@@ -32,13 +34,13 @@ class ApiKeyController extends ApplicationApiController
      * @throws \Pterodactyl\Exceptions\DisplayException
      * @throws \Pterodactyl\Exceptions\Model\DataValidationException
      */
-    public function store($user)
+    public function store(StoreUserApiKeyRequest $request, $user)
     {
         $user = User::findOrFail($user);
 
         $token = $user->createToken(
-            request('description'),
-            request('allowed_ips')
+            $request->input('description'),
+            $request->input('allowed_ips', [])
         );
 
         return $this->fractal->item($token->accessToken)
@@ -54,7 +56,7 @@ class ApiKeyController extends ApplicationApiController
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function delete(GetUsersApiKeysRequest $request, $user, string $identifier)
+    public function delete(DeleteUserApiKeyRequest $request, $user, string $identifier)
     {
         $user = User::findOrFail($user);
 

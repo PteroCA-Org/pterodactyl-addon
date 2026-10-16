@@ -9,7 +9,7 @@ class PterocaPluginVersionController extends ApplicationApiController
     /**
      * Current version of the PteroCA addon.
      */
-    const VERSION = '0.1.3';
+    const VERSION = '0.1.4';
 
     /**
      * Get the current version of the PteroCA addon.

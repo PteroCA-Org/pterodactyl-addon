@@ -2,7 +2,6 @@
 
 namespace Pteroca\PterodactylAddon\Http\Controllers;
 
-use Pteroca\PterodactylAddon\Http\Requests\SSOLoginRequest;
 use Pteroca\PterodactylAddon\Services\JwtService;
 use Pterodactyl\Http\Controllers\Api\Application\ApplicationApiController;
 use Illuminate\Http\Request;
@@ -33,7 +32,7 @@ class SSOAuthorizationController extends AbstractLoginController
         }
 
         $pterodactylUserId = $decodedToken->user->id;
-        $user = User::findOrFail($pterodactylUserId);
+        $user = User::find($pterodactylUserId);
         if (empty($user)) {
             return response()->json(['error' => 'User not found'], 404);
         }
@@ -44,6 +43,18 @@ class SSOAuthorizationController extends AbstractLoginController
 
         $this->sendLoginResponse($user, $request);
 
-        return redirect()->intended($request->post('pteroca_sso_redirect') ?? '/');
+        return redirect()->intended($this->safeRedirectPath($request->post('pteroca_sso_redirect')));
+    }
+
+    /**
+     * Only allow same-origin relative paths as post-login redirect targets.
+     */
+    private function safeRedirectPath($path): string
+    {
+        if (!is_string($path) || $path === '' || $path[0] !== '/' || str_starts_with($path, '//') || str_contains($path, '\\')) {
+            return '/';
+        }
+
+        return $path;
     }
 }

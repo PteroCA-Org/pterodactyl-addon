@@ -11,18 +11,25 @@ class JwtService
 
     public function __construct()
     {
-        $this->secret = env('PTEROCA_SSO_SECRET');
+        $this->secret = (string) env('PTEROCA_SSO_SECRET', '');
     }
 
     public function decodeToken(?string $token): ?object
     {
-        if (empty($token)) {
+        if (empty($token) || $this->secret === '') {
             return null;
         }
 
         try {
-            return JWT::decode($token, new Key($this->secret, 'HS256'));
-        } catch (\Exception $exception) {
+            $decoded = JWT::decode($token, new Key($this->secret, 'HS256'));
+
+            // Tokens issued by PteroCA always carry a short expiry; refuse tokens without one.
+            if (empty($decoded->exp)) {
+                return null;
+            }
+
+            return $decoded;
+        } catch (\Throwable $exception) {
             return null;
         }
     }
